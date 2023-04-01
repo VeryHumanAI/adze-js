@@ -1,2 +1,2 @@
-# adze-js
+# AdzeJS
 AI Prompt Refinement Too
