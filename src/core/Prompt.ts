@@ -20,10 +20,15 @@ export class Prompt {
     this.validate();
   }
 
-  public toJSON(values: { [key: string]: string }): PromptAttributes {
+  public toJSON(values: { [key: string]: string }): Record<string, unknown> {
     return {
-      ...this.attributes,
+      frequency_penalty: this.attributes.frequencyPenalty,
+      max_tokens: this.attributes.maximumLength,
+      model: this.attributes.model,
+      presence_penalty: this.attributes.presencePenalty,
       prompt: this.interpolatePromptString(values),
+      temperature: this.attributes.temperature,
+      top_p: this.attributes.topP,
     };
   }
 

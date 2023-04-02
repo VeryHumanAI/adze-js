@@ -1,5 +1,6 @@
 import { OpenAIApi, Configuration } from "openai";
 import { Message } from "./MessageHandler";
+import { Prompt } from "./Prompt";
 
 export class Assistant {
   public defaultMessage: string = "Sorry, I am unable to provide a response.";
@@ -10,11 +11,11 @@ export class Assistant {
   }
 
   public async createResponse(
-    promptSettings: any,
+    prompt: Prompt,
     messages: Message[],
   ): Promise<string> {
     const response = await this.openai.createChatCompletion({
-      model: promptSettings.model,
+      model: prompt.model,
       messages: messages,
     });
 
