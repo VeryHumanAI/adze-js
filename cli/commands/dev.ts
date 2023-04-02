@@ -5,7 +5,7 @@ import path from "path";
 import readline from "readline";
 
 import { Assistant } from "../../src/core/Assistant";
-import { MessageHandler } from "../../src/core/MessageHandler";
+import { Message, MessageHandler } from "../../src/core/MessageHandler";
 
 dotenv.config();
 
@@ -51,7 +51,10 @@ const dev = async (options: { snapshotVersion?: number }) => {
 
   const processUserInput = async (input: string) => {
     if (input.trim()) {
-      messageHandler.addMessage("user", input);
+      messageHandler.addMessage({
+        content: input,
+        role: "user",
+      } as Message);
 
       try {
         const assistantOutput = await assistant.createResponse(
@@ -60,7 +63,10 @@ const dev = async (options: { snapshotVersion?: number }) => {
         );
 
         console.log(`Assistant: ${assistantOutput}`);
-        messageHandler.addMessage("assistant", assistantOutput);
+        messageHandler.addMessage({
+          content: assistantOutput,
+          role: "assistant",
+        } as Message);
       } catch (error: any) {
         console.error("Error communicating with AI: ", error.message);
       }

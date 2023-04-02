@@ -1,10 +1,36 @@
 import dotenv from "dotenv";
 import fs from "fs";
+import inquirer from "inquirer";
 import path from "path";
-import { Refinement } from "../../src/core/Refinement";
 import { MessageHandler } from "../../src/core/MessageHandler";
+import { Prompt } from "../../src/core/Prompt";
+import {
+  Refinement,
+  RefinementOptions,
+  RefinementResult,
+} from "../../src/core/Refinement";
 
 dotenv.config();
+
+const askUserForComment = async (): Promise<string> => {
+  const { comment } = await inquirer.prompt<{ comment: string }>({
+    type: "input",
+    name: "comment",
+    message: "Enter your comment about the AI's response:",
+  });
+
+  return comment;
+};
+
+const confirmRefinement = async (): Promise<boolean> => {
+  const { satisfied } = await inquirer.prompt<{ satisfied: boolean }>({
+    type: "confirm",
+    name: "satisfied",
+    message: "Are you satisfied with the refined prompt?",
+    default: true,
+  });
+  return satisfied;
+};
 
 // Refine command action
 const refine = async () => {
@@ -13,29 +39,67 @@ const refine = async () => {
   const refinementsPath = path.join(process.cwd(), "refinements");
 
   // Read and validate prompt.json
-  let promptSettings: any;
+  let currentPrompt: Prompt;
   if (fs.existsSync(promptFilePath)) {
-    promptSettings = JSON.parse(fs.readFileSync(promptFilePath, "utf8"));
-    // TODO: Add validation checks here
+    const promptSettings = JSON.parse(fs.readFileSync(promptFilePath, "utf8"));
+    currentPrompt = new Prompt(promptSettings);
   } else {
     console.error("Error: The required prompt.json file is missing.");
     process.exit(1);
   }
 
   const messageHandler = new MessageHandler(messagesFilePath);
-  const refinementHandler = new Refinement(promptSettings, refinementsPath);
+  const refinementOptions: RefinementOptions = {
+    currentPrompt,
+    messages: messageHandler.getMessages(),
+  };
+  const refinementHandler = new Refinement(refinementOptions);
 
-  // TODO: Implement refine method in Refinement.ts and call here
-  const updatedPromptSettings = await refinementHandler.refine(
-    messageHandler.getMessages(),
-    // TODO: Add user comments about the unwanted AI response
-  );
+  let comments: string[] = [];
+  let happyWithRefinement = false;
+  let refinementResult: RefinementResult | undefined;
 
-  // Update prompt.json with the updated prompt settings
-  fs.writeFileSync(
-    promptFilePath,
-    JSON.stringify(updatedPromptSettings, null, 2),
-  );
+  while (!happyWithRefinement) {
+    // Get user's comment(s) from the command line
+    const comment = await askUserForComment();
+    comments.push(comment);
+
+    // Run refine on their comment array
+    refinementResult = await refinementHandler.refine(comments);
+
+    console.log("Refinement Result:", refinementResult);
+
+    // Save the RefinementResult to a new file
+    const timestamp = Date.now();
+    const filename = `${timestamp}-${refinementResult.title
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")}.json`;
+    fs.writeFileSync(
+      path.join(refinementsPath, filename),
+      JSON.stringify(refinementResult, null, 2),
+    );
+
+    // Ask the user if they are happy with the refinement
+    happyWithRefinement = await confirmRefinement();
+  }
+
+  if (refinementResult) {
+    // Update prompt.json with the updated prompt settings
+    fs.writeFileSync(
+      promptFilePath,
+      JSON.stringify(
+        {
+          ...currentPrompt.toJSON(),
+          prompt: refinementResult.updatedPrompt,
+        },
+        null,
+        2,
+      ),
+    );
+  } else {
+    console.error("Error: No refinement result found.");
+    process.exit(1);
+  }
 
   console.log("Refinement process completed. The prompt has been updated.");
 };
