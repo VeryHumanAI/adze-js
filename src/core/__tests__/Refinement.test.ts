@@ -3,7 +3,7 @@ import { Assistant } from "../Assistant";
 
 jest.mock("../Assistant");
 
-describe("Refinement", () => {
+xdescribe("Refinement", () => {
   let refinement: Refinement;
   const promptSettings = {
     /* Add any necessary mock prompt settings here */

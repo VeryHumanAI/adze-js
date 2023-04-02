@@ -1,13 +1,13 @@
-import { Message, MessageHandler } from "../MessageHandler";
 import fs from "fs";
+import { Message, MessageHandler } from "../MessageHandler";
 
 jest.mock("fs"); // Mock the 'fs' module
 
 describe("MessageHandler", () => {
   const messagesFilePath = "testMessages.json";
   const testMessages = [
-    { role: "user", content: "Hello, Assistant!" },
-    { role: "assistant", content: "Hello, User!" },
+    { content: "Hello, Assistant!", role: "user" },
+    { content: "Hello, User!", role: "assistant" },
   ];
 
   beforeEach(() => {
@@ -33,11 +33,14 @@ describe("MessageHandler", () => {
   it("should properly add a message and write it to the file", () => {
     const messageHandler = new MessageHandler(messagesFilePath);
     const newMessage: Message = {
-      role: "user",
       content: "What's the weather like today?",
+      role: "user",
     };
 
-    messageHandler.addMessage(newMessage.role, newMessage.content);
+    messageHandler.addMessage({
+      content: newMessage.content,
+      role: newMessage.role,
+    } as Message);
 
     expect(fs.writeFileSync).toHaveBeenCalledWith(
       messagesFilePath,

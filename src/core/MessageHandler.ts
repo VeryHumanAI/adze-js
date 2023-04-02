@@ -1,8 +1,8 @@
 import fs from "fs";
 
 export interface Message {
-  role: "user" | "assistant";
   content: string;
+  role: "user" | "assistant";
 }
 
 export class MessageHandler {

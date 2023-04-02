@@ -1,5 +1,10 @@
 import { Assistant } from "../Assistant";
 import { Message } from "../MessageHandler";
+import { Prompt } from "../Prompt";
+import {
+  defaultCompletionMessage,
+  defaultPromptAttributes,
+} from "../constants";
 
 const createChatCompletionMock = jest.fn();
 
@@ -38,10 +43,11 @@ describe("Assistant", () => {
       },
     });
 
-    const promptSettings = { model: "gpt-4" };
     const messages: Message[] = [{ role: "user", content: "Test message" }];
-
-    const result = await testAssistant.createResponse(promptSettings, messages);
+    const result = await testAssistant.createResponse(
+      new Prompt(defaultPromptAttributes),
+      messages,
+    );
     expect(result).toBe("Test response");
   });
 
@@ -57,10 +63,11 @@ describe("Assistant", () => {
       },
     });
 
-    const promptSettings = { model: "gpt-4" };
     const messages: Message[] = [{ role: "user", content: "Test message" }];
-
-    const result = await testAssistant.createResponse(promptSettings, messages);
-    expect(result).toBe(testAssistant.defaultMessage);
+    const result = await testAssistant.createResponse(
+      new Prompt(defaultPromptAttributes),
+      messages,
+    );
+    expect(result).toBe(defaultCompletionMessage);
   });
 });

@@ -20,7 +20,9 @@ export class Prompt {
     this.validate();
   }
 
-  public toJSON(values: { [key: string]: string }): Record<string, unknown> {
+  public toJSON(
+    values?: { [key: string]: string } | undefined,
+  ): Record<string, unknown> {
     return {
       frequency_penalty: this.attributes.frequencyPenalty,
       max_tokens: this.attributes.maximumLength,
@@ -32,7 +34,9 @@ export class Prompt {
     };
   }
 
-  private interpolatePromptString(values: { [key: string]: string }): string {
+  private interpolatePromptString(values?: { [key: string]: string }): string {
+    if (!values) return this.attributes.prompt;
+
     return Object.entries(values).reduce(
       (acc, [key, value]) => acc.replace(`{{ ${key} }}`, value),
       this.attributes.prompt,
