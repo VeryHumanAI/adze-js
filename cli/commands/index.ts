@@ -1,13 +1,14 @@
 #!/usr/bin/env ts-node-dev
 /// <reference types="node" />
 
-import "source-map-support/register";
 import { Command } from "commander";
-import snapshot from "./snapshot";
+import "source-map-support/register";
+
 import dev from "./dev";
 import init from "./init";
-// import refine from "./refine";
-// import test from "./test";
+import refine from "./refine";
+import snapshot from "./snapshot";
+import test from "./test";
 
 const program = new Command();
 
@@ -29,10 +30,10 @@ program
   .description("Initialize a new AdzeJS project")
   .action(init);
 
-// program
-//   .command("refine")
-//   .description("Refine the current prompt")
-//   .action(refine);
+program
+  .command("refine")
+  .description("Refine the current prompt")
+  .action(refine);
 
 program
   .command("snapshot")
@@ -43,10 +44,10 @@ program
   )
   .action((options) => snapshot(options));
 
-// program
-//   .command("test [files...]")
-//   .description("Run tests for the current prompt")
-//   .option("-t, --tag <tag>", "Run tests with the specified tag only")
-//   .action((files, options) => test(files, options));
+program
+  .command("test [files...]")
+  .description("Run tests for the current prompt")
+  .option("-t, --tag <tag>", "Run tests with the specified tag only")
+  .action((files, options) => test(files, options));
 
 program.parse(process.argv);
