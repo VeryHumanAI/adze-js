@@ -4,7 +4,7 @@
 import "source-map-support/register";
 import { Command } from "commander";
 import snapshot from "./snapshot";
-// import dev from "./dev";
+import dev from "./dev";
 import init from "./init";
 // import refine from "./refine";
 // import test from "./test";
@@ -15,14 +15,14 @@ program
   .version("0.1.0")
   .description("AdzeJS: An advanced AI prompt refinement tool for developers.");
 
-// program
-//   .command("dev")
-//   .description("Start the development REPL")
-//   .option(
-//     "-v, --version <number>",
-//     "Specify a version number for the system prompt",
-//   )
-//   .action((options) => dev(options));
+program
+  .command("dev")
+  .description("Start the development REPL")
+  .option(
+    "-s, --snapshot-version <number>",
+    "Specify a version number for the system prompt snapshot",
+  )
+  .action((options) => dev(options));
 
 program
   .command("init")

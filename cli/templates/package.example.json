@@ -4,6 +4,7 @@
   "description": "AdzeJS project for AI prompt refinement",
   "type": "module",
   "scripts": {
+    "dev": "adze-js dev",
     "refine": "adze-js refine",
     "snapshot": "adze-js snapshot",
     "test": "adze-js test"
