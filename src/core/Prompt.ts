@@ -23,24 +23,37 @@ export class Prompt {
   public toJSON(
     values?: { [key: string]: string } | undefined,
   ): Record<string, unknown> {
+    const updatedPrompt = this.withUpdatedPrompt(values);
+
     return {
-      frequency_penalty: this.attributes.frequencyPenalty,
-      max_tokens: this.attributes.maximumLength,
-      model: this.attributes.model,
-      presence_penalty: this.attributes.presencePenalty,
-      prompt: this.interpolatePromptString(values),
-      temperature: this.attributes.temperature,
-      top_p: this.attributes.topP,
+      frequency_penalty: updatedPrompt.attributes.frequencyPenalty,
+      max_tokens: updatedPrompt.attributes.maximumLength,
+      model: updatedPrompt.attributes.model,
+      presence_penalty: updatedPrompt.attributes.presencePenalty,
+      prompt: updatedPrompt.attributes.prompt,
+      temperature: updatedPrompt.attributes.temperature,
+      top_p: updatedPrompt.attributes.topP,
     };
+  }
+
+  public withUpdatedPrompt(
+    values?: { [key: string]: string } | undefined,
+  ): Prompt {
+    return new Prompt({
+      ...this.attributes,
+      prompt: this.interpolatePromptString(values),
+    });
   }
 
   private interpolatePromptString(values?: { [key: string]: string }): string {
     if (!values) return this.attributes.prompt;
 
-    return Object.entries(values).reduce(
-      (acc, [key, value]) => acc.replace(`{{ ${key} }}`, value),
-      this.attributes.prompt,
-    );
+    let updatedPrompt = this.attributes.prompt;
+    for (const key in values) {
+      updatedPrompt = updatedPrompt.replace(`{{ $${key} }}`, values[key]);
+    }
+
+    return updatedPrompt;
   }
 
   private isIncludedIn(value: string, array: string[]): boolean {

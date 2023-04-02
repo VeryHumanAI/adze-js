@@ -18,8 +18,7 @@ jest.mock("openai", () => {
 });
 
 describe("Assistant", () => {
-  const API_KEY = "dummy_api_key";
-  const testAssistant = new Assistant(API_KEY);
+  const testAssistant = new Assistant("dummy_api_key");
 
   beforeEach(() => {
     createChatCompletionMock.mockReset();

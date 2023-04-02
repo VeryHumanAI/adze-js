@@ -1,60 +1,70 @@
-import fs from "fs";
-import path from "path";
-import { Prompt } from "./Prompt";
 import { Assistant } from "./Assistant";
 import { Message } from "./MessageHandler";
+import { Prompt, PromptAttributes } from "./Prompt";
 import { defaultRefinementPrompt } from "./constants";
 
-export interface RefinementOptions {
-  comments: string[];
-  defaultRefinementPrompt?: Prompt;
-}
+type RefinementOptions = {
+  currentPrompt: Prompt;
+  messages: Message[];
+  refinementPromptOverrides?: Partial<PromptAttributes>;
+};
 
-export interface RefinementResult {
+type RefinementResult = {
   description: string;
   refinementStatement: string;
   title: string;
   updatedPrompt: string;
-}
+};
 
-export class Refinement {
+class Refinement {
   private assistant: Assistant;
-  private comments: string[];
-  private promptSettings: Prompt;
+  private currentPrompt: Prompt;
+  private messages: Message[];
   private refinementPrompt: Prompt;
-  private refinementsPath: string;
 
-  constructor(
-    promptSettings: Prompt,
-    refinementsPath: string,
-    options: RefinementOptions,
-  ) {
-    this.comments = options.comments;
-    this.promptSettings = promptSettings;
-    this.refinementsPath = refinementsPath;
-    this.refinementPrompt =
-      options.defaultRefinementPrompt || defaultRefinementPrompt;
-
-    this.assistant = new Assistant(process.env.OPENAI_API_KEY);
+  constructor(options: RefinementOptions) {
+    this.assistant = new Assistant(process.env.OPENAI_API_KEY as string);
+    this.currentPrompt = options.currentPrompt;
+    this.messages = options.messages;
+    this.refinementPrompt = new Prompt({
+      ...defaultRefinementPrompt,
+      ...options.refinementPromptOverrides,
+    } as PromptAttributes);
   }
 
-  public async refine(messages: Message[]): Promise<RefinementResult> {
-    // Prepare the prompt with string interpolation
-    const prompt = this.refinementPrompt.prompt
-      .replace("{{ PROJECT_CONTEXT_GOALS }}", "Your project context and goals")
-      .replace("{{ CURRENT_SYSTEM_PROMPT }}", this.promptSettings.prompt)
-      .replace("{{ PROMPT_COMMENTS_REQUESTS }}", this.comments.join("\n"));
+  public async refine(comments: string[]): Promise<RefinementResult> {
+    if (comments.length === 0) {
+      throw new Error("At least one comment is required for refinement.");
+    }
 
-    // Update the promptSettings with the interpolated prompt
-    const promptWithVars: Prompt = { ...this.promptSettings, ...{ prompt } };
+    const refinementPrompt = this.refinementPrompt.withUpdatedPrompt({
+      CURRENT_SYSTEM_PROMPT: JSON.stringify(this.currentPrompt.toJSON()),
+      PROMPT_COMMENTS_REQUESTS: comments
+        .map((comment) => `- ${comment}`)
+        .join("\n"),
+    });
 
-    // Call the Assistant API to refine the prompt
-    const response = await this.assistant.generate(promptWithVars, messages);
+    const response = await this.assistant.createResponse(
+      this.refinementPrompt,
+      this.messages,
+    );
 
-    // ...
-    // From the AI response, extract the desired values and return the `RefinementResult` object
+    if (!this.validateResponse(response)) {
+      throw new Error("Invalid response received from OpenAI API.");
+    }
 
-    // Save the returned refinement to a refinement.json file
-    // ...
+    return refinementResult;
+  }
+
+  private validateResponse(response: RefinementResult): boolean {
+    // Add more validation checks if needed
+    return (
+      response.description !== "" &&
+      response.refinementStatement !== "" &&
+      response.title !== "" &&
+      response.updatedPrompt !== ""
+    );
   }
 }
+
+export { Refinement, RefinementOptions, RefinementResult };

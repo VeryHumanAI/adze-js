@@ -104,18 +104,27 @@ describe("Prompt", () => {
     });
   });
 
-  it("should interpolate prompt string correctly", () => {
-    const prompt = new Prompt({
-      ...validAttributes,
-      prompt: "My name is {{ name }}. I live at {{ address }}.",
-    });
-    const json = prompt.toJSON({
-      address: "742 Evergreen Terrace",
-      name: "Homer Simpson",
-    });
+  describe("withUpdatedPrompt", () => {
+    it("returns a new instance with updated prompt", () => {
+      const prompt = new Prompt({
+        ...validAttributes,
+        prompt: "Hello {{ $name }}!",
+      });
+      const updatedPrompt = prompt.withUpdatedPrompt({ name: "John" });
 
-    expect(json.prompt).toBe(
-      "My name is Homer Simpson. I live at 742 Evergreen Terrace.",
-    );
+      expect(updatedPrompt.toJSON().prompt).toBe("Hello John!");
+    });
+  });
+
+  describe("toJSON", () => {
+    it("can take interpolation directly", () => {
+      const prompt = new Prompt({
+        ...validAttributes,
+        prompt: "Hello {{ $name }}!",
+      });
+      const jsonPrompt = prompt.toJSON({ name: "John" });
+
+      expect(jsonPrompt.prompt).toBe("Hello John!");
+    });
   });
 });
