@@ -1,2 +1,3 @@
 # AdzeJS
-AI Prompt Refinement Too
+
+AI Prompt Refinement Tool

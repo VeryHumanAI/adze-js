@@ -1,0 +1,44 @@
+{
+  "name": "adze-js",
+  "version": "1.0.0",
+  "description": "AI-driven prompt refinement NPM package",
+  "main": "dist/cli/index.js",
+  "types": "dist/cli/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node-dev --respawn --transpile-only src/cli/index.ts",
+    "format": "prettier --write \"src/**/*.ts\" \"*.json\"",
+    "start": "node dist/cli/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VeryHumanAI/adze-js.git"
+  },
+  "keywords": [
+    "AI",
+    "prompts",
+    "OpenAI",
+    "GPT",
+    "refinement",
+    "JavaScript"
+  ],
+  "author": "Conroy Whitney <konreu@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/VeryHumanAI/adze-js/issues"
+  },
+  "homepage": "https://github.com/VeryHumanAI/adze-js#readme",
+  "dependencies": {
+    "@types/node": "^16.11.12",
+    "typescript": "^4.5.2",
+    "ts-node-dev": "^1.1.12",
+    "openai": "^0.27.0",
+    "dotenv": "^10.0.0",
+    "commander": "^8.3.0"
+  },
+  "devDependencies": {
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "prettier": "^2.8.7"
+  }
+}
