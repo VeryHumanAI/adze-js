@@ -37,7 +37,7 @@ class Refinement {
       throw new Error("At least one comment is required for refinement.");
     }
 
-    const refinementPrompt = this.refinementPrompt.withUpdatedPrompt({
+    const updatedRefinementPrompt = this.refinementPrompt.withUpdatedPrompt({
       CURRENT_SYSTEM_PROMPT: JSON.stringify(this.currentPrompt.toJSON()),
       PROMPT_COMMENTS_REQUESTS: comments
         .map((comment) => `- ${comment}`)
@@ -45,25 +45,51 @@ class Refinement {
     });
 
     const response = await this.assistant.createResponse(
-      this.refinementPrompt,
+      updatedRefinementPrompt,
       this.messages,
     );
 
-    if (!this.validateResponse(response)) {
-      throw new Error("Invalid response received from OpenAI API.");
-    }
-
-    return refinementResult;
+    return this.parseResponse(response);
   }
 
-  private validateResponse(response: RefinementResult): boolean {
-    // Add more validation checks if needed
-    return (
-      response.description !== "" &&
-      response.refinementStatement !== "" &&
-      response.title !== "" &&
-      response.updatedPrompt !== ""
-    );
+  private parseResponse(response: string): RefinementResult {
+    try {
+      const refinementResult = JSON.parse(response) as RefinementResult;
+
+      if (!this.validateResult(refinementResult)) {
+        throw new Error("Invalid response received from OpenAI API.");
+      }
+
+      return refinementResult;
+    } catch (error: any) {
+      throw new Error(
+        `Error parsing response from OpenAI API: ${error.message}`,
+      );
+    }
+  }
+
+  private validateResult(response: RefinementResult): boolean {
+    if (!response) return false;
+
+    const requiredKeys = [
+      "description",
+      "refinementStatement",
+      "title",
+      "updatedPrompt",
+    ];
+
+    for (const key of requiredKeys) {
+      if (
+        !Object.prototype.hasOwnProperty.call(response, key) ||
+        typeof response[key as keyof RefinementResult] !== "string" ||
+        response[key as keyof RefinementResult] === ""
+      ) {
+        return false;
+      }
+    }
+
+    // Return true if all checks pass
+    return true;
   }
 }
 

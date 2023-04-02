@@ -16,7 +16,7 @@ export class Test {
     this.promptSettings = promptSettings;
     this.testsPath = testsPath;
     this.tagFilter = tagFilter;
-    this.assistant = new Assistant("dummy_api_key");
+    this.assistant = new Assistant("fake-api-key");
   }
 
   public async executeTests(messages: any[]): Promise<any> {

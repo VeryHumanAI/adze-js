@@ -1,7 +1,6 @@
 import { Configuration, OpenAIApi } from "openai";
 import { Message } from "./MessageHandler";
 import { Prompt } from "./Prompt";
-import { defaultCompletionMessage } from "./constants";
 
 export class Assistant {
   private openai: OpenAIApi;
@@ -15,13 +14,21 @@ export class Assistant {
     messages: Message[],
     values?: { [key: string]: string },
   ): Promise<string> {
-    const response = await this.openai.createChatCompletion({
-      ...prompt.toJSON(values),
-      messages,
-    } as any);
+    try {
+      const response = await this.openai.createChatCompletion({
+        ...prompt.toJSON(values),
+        messages,
+      } as any);
 
-    return (
-      response?.data?.choices[0]?.message?.content || defaultCompletionMessage
-    );
+      if (response?.data?.choices[0]?.message?.content) {
+        return response.data.choices[0].message.content;
+      } else {
+        throw new Error("Invalid content in OpenAI API response.");
+      }
+    } catch (error: any) {
+      throw new Error(
+        `Error creating response from OpenAI API: ${error.message}`,
+      );
+    }
   }
 }
