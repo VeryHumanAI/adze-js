@@ -20,19 +20,18 @@ export class Prompt {
     this.validate();
   }
 
-  // Interpolate prompt string with variables
-  public interpolatePromptString(replacements: {
-    [key: string]: string;
-  }): Prompt {
-    const interpolatedPrompt = Object.entries(replacements).reduce(
+  public toJSON(values: { [key: string]: string }): PromptAttributes {
+    return {
+      ...this.attributes,
+      prompt: this.interpolatePromptString(values),
+    };
+  }
+
+  private interpolatePromptString(values: { [key: string]: string }): string {
+    return Object.entries(values).reduce(
       (acc, [key, value]) => acc.replace(`{{ ${key} }}`, value),
       this.attributes.prompt,
     );
-
-    return new Prompt({
-      ...this.attributes,
-      ...{ prompt: interpolatedPrompt },
-    });
   }
 
   private isIncludedIn(value: string, array: string[]): boolean {
@@ -43,8 +42,16 @@ export class Prompt {
     value: number,
     minValue: number,
     maxValue: number,
+    wholeNumber?: boolean,
   ): boolean {
-    return typeof value === "number" && value >= minValue && value <= maxValue;
+    const isWhole = wholeNumber ? Number.isInteger(value) : true;
+
+    return (
+      typeof value === "number" &&
+      value >= minValue &&
+      value <= maxValue &&
+      isWhole
+    );
   }
 
   private isValidString(
@@ -59,7 +66,6 @@ export class Prompt {
     );
   }
 
-  // Validate prompt keys and values
   private validate(): void {
     const requiredKeys = Object.keys(defaultPromptAttributes);
 
@@ -79,16 +85,16 @@ export class Prompt {
           }
           break;
         case "maximumLength":
-          if (!this.isValidNumber(this.attributes[key], 1, 4096)) {
+          if (!this.isValidNumber(this.attributes[key], 1, 2048, true)) {
             throw new Error(
-              `Error: ${key} must be a number between 1 and 4096.`,
+              `Error: ${key} must be a number between 1 and 2048.`,
             );
           }
           break;
         case "model":
           if (!this.isIncludedIn(this.attributes[key], supportedModels)) {
             throw new Error(
-              `Error: ${key} must be one of [${supportedModels.join(", ")}]]`,
+              `Error: ${key} must be one of [${supportedModels.join(", ")}]`,
             );
           }
           break;

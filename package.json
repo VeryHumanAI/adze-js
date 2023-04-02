@@ -34,6 +34,7 @@
   },
   "homepage": "https://github.com/VeryHumanAI/adze-js#readme",
   "dependencies": {
+    "@ngneat/falso": "^6.4.0",
     "@types/node": "^18.15.11",
     "commander": "^8.3.0",
     "dotenv": "^10.0.0",
