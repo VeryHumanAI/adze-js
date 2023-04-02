@@ -4,6 +4,9 @@ import { Configuration, OpenAIApi } from "openai";
 import path from "path";
 import readline from "readline";
 
+import { Assistant } from "../../src/core/Assistant";
+import { MessageHandler } from "../../src/core/MessageHandler";
+
 dotenv.config();
 
 // 4. Display the prompt settings and chat history if available, then start the REPL.
@@ -25,7 +28,7 @@ const dev = async (options: { snapshotVersion?: number }) => {
   const messagesFilePath = path.join(process.cwd(), "messages.json");
 
   // Read and validate prompt.json
-  let promptSettings;
+  let promptSettings: any;
   if (fs.existsSync(promptFilePath)) {
     promptSettings = JSON.parse(fs.readFileSync(promptFilePath, "utf8"));
     // Add validation checks here
@@ -43,8 +46,25 @@ const dev = async (options: { snapshotVersion?: number }) => {
     prompt: ">> ",
   });
 
+  const messageHandler = new MessageHandler(messagesFilePath);
+  const assistant = new Assistant(process.env.OPENAI_API_KEY);
+
   const processUserInput = async (input: string) => {
-    // Handle user input, slash commands, and communication with the AI
+    if (input.trim()) {
+      messageHandler.addMessage("user", input);
+
+      try {
+        const assistantOutput = await assistant.createResponse(
+          promptSettings,
+          messageHandler.getMessages(),
+        );
+
+        console.log(`Assistant: ${assistantOutput}`);
+        messageHandler.addMessage("assistant", assistantOutput);
+      } catch (error: any) {
+        console.error("Error communicating with AI: ", error.message);
+      }
+    }
   };
 
   const main = async () => {
