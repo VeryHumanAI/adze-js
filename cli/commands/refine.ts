@@ -13,7 +13,8 @@ import {
 dotenv.config();
 
 const askUserForComment = async (): Promise<string> => {
-  const { comment } = await inquirer.prompt<{ comment: string }>({
+  const inquirer = await import("inquirer");
+  const { comment } = await inquirer.default.prompt<{ comment: string }>({
     type: "input",
     name: "comment",
     message: "Enter your comment about the AI's response:",
@@ -23,7 +24,8 @@ const askUserForComment = async (): Promise<string> => {
 };
 
 const confirmRefinement = async (): Promise<boolean> => {
-  const { satisfied } = await inquirer.prompt<{ satisfied: boolean }>({
+  const inquirer = await import("inquirer");
+  const { satisfied } = await inquirer.default.prompt<{ satisfied: boolean }>({
     type: "confirm",
     name: "satisfied",
     message: "Are you satisfied with the refined prompt?",
