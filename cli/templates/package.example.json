@@ -4,10 +4,9 @@
   "description": "AdzeJS project for AI prompt refinement",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "refine": "adze-js refine",
-    "test": "adze-js test",
-    "build": "adze-js build"
+    "snapshot": "adze-js snapshot",
+    "test": "adze-js test"
   },
   "repository": {
     "type": "git",

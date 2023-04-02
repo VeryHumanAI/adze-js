@@ -3,7 +3,7 @@
 
 import "source-map-support/register";
 import { Command } from "commander";
-// import build from "./build";
+import snapshot from "./snapshot";
 // import dev from "./dev";
 import init from "./init";
 // import refine from "./refine";
@@ -14,11 +14,6 @@ const program = new Command();
 program
   .version("0.1.0")
   .description("AdzeJS: An advanced AI prompt refinement tool for developers.");
-
-// program
-//   .command("build")
-//   .description("Build a snapshot of the current prompt for deployment")
-//   .action(build);
 
 // program
 //   .command("dev")
@@ -38,6 +33,15 @@ program
 //   .command("refine")
 //   .description("Refine the current prompt")
 //   .action(refine);
+
+program
+  .command("snapshot")
+  .description("Build a snapshot of the current prompt for deployment")
+  .option(
+    "-s, --snapshot-version <version>",
+    "Specify the version number for the snapshot (will auto-increment otherwise)",
+  )
+  .action((options) => snapshot(options));
 
 // program
 //   .command("test [files...]")

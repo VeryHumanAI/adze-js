@@ -20,11 +20,21 @@ async function init() {
 
   fs.mkdirSync(projectDir);
   fs.mkdirSync(path.join(projectDir, "refinements"));
+  fs.mkdirSync(path.join(projectDir, "snapshots"));
+  fs.writeFileSync(path.join(projectDir, "snapshots", ".keep"), "");
   fs.mkdirSync(path.join(projectDir, "tests"));
 
   fs.copyFileSync(
     path.join(__dirname, "../templates/env.example"),
     path.join(projectDir, ".env"),
+  );
+  fs.copyFileSync(
+    path.join(__dirname, "../templates/example-refinement.json"),
+    path.join(projectDir, "refinements/0000000000-example-refinement.json"),
+  );
+  fs.copyFileSync(
+    path.join(__dirname, "../templates/example-test.json"),
+    path.join(projectDir, "tests/0000000000-example-test.json"),
   );
   fs.copyFileSync(
     path.join(__dirname, "../templates/messages.example.json"),
