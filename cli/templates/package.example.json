@@ -2,6 +2,7 @@
   "name": "your-adze-js-project",
   "version": "1.0.0",
   "description": "AdzeJS project for AI prompt refinement",
+  "type": "module",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
     "refine": "adze-js refine",
