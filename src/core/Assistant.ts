@@ -15,9 +15,15 @@ export class Assistant {
     values?: { [key: string]: string },
   ): Promise<string> {
     try {
+      const { prompt: systemPrompt, ...config } = prompt.toJSON(values);
       const response = await this.openai.createChatCompletion({
-        ...prompt.toJSON(values),
-        messages,
+        ...config,
+        messages: [
+          {
+            content: systemPrompt as string,
+            role: "system",
+          },
+        ].concat(messages),
       } as any);
 
       if (response?.data?.choices[0]?.message?.content) {

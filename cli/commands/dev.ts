@@ -6,6 +6,7 @@ import readline from "readline";
 
 import { Assistant } from "../../src/core/Assistant";
 import { Message, MessageHandler } from "../../src/core/MessageHandler";
+import { Prompt, PromptAttributes } from "../../src/core/Prompt";
 
 dotenv.config();
 
@@ -28,15 +29,15 @@ const dev = async (options: { snapshotVersion?: number }) => {
   const messagesFilePath = path.join(process.cwd(), "messages.json");
 
   // Read and validate prompt.json
-  let promptSettings: any;
+  let promptAttributes: PromptAttributes;
   if (fs.existsSync(promptFilePath)) {
-    promptSettings = JSON.parse(fs.readFileSync(promptFilePath, "utf8"));
+    promptAttributes = JSON.parse(fs.readFileSync(promptFilePath, "utf8"));
     // Add validation checks here
   } else {
     // First run, set up default settings and ask user for prompt details
-    promptSettings = {
-      /* default settings */
-    };
+    // promptAttributes = {
+    //   /* default settings */
+    // };
   }
 
   // 3. Set up the readline interface and create a helper function to process user input.
@@ -58,7 +59,7 @@ const dev = async (options: { snapshotVersion?: number }) => {
 
       try {
         const assistantOutput = await assistant.createResponse(
-          promptSettings,
+          new Prompt(promptAttributes),
           messageHandler.getMessages(),
         );
 
