@@ -12,7 +12,8 @@
     "build": "tsc",
     "dev": "ts-node-dev --respawn --transpile-only src/cli/index.ts",
     "format": "prettier --write \"src/**/*.ts\" \"*.json\"",
-    "start": "node dist/cli/index.js"
+    "start": "node dist/cli/index.js",
+    "test": "jest --watch"
   },
   "repository": {
     "type": "git",

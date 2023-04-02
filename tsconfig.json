@@ -1,9 +1,13 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "module": "CommonJS",
     "outDir": "./dist",
+    "paths": {
+      "@/": ["src"]
+    },
     "rootDirs": ["./cli", "./src"],
     "skipLibCheck": true,
     "sourceMap": true,
