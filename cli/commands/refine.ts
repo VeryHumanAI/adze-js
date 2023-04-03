@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 import fs from "fs";
-import inquirer from "inquirer";
 import path from "path";
+import readline from "readline";
 import { MessageHandler } from "../../src/core/MessageHandler";
 import { Prompt } from "../../src/core/Prompt";
 import {
@@ -12,26 +12,29 @@ import {
 
 dotenv.config();
 
-const askUserForComment = async (): Promise<string> => {
-  const inquirer = await import("inquirer");
-  const { comment } = await inquirer.default.prompt<{ comment: string }>({
-    type: "input",
-    name: "comment",
-    message: "Enter your comment about the AI's response:",
-  });
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
 
-  return comment;
+const askUserForComment = async (): Promise<string> => {
+  return new Promise((resolve) => {
+    rl.question("Enter your comment about the AI's response: ", (answer) => {
+      resolve(answer);
+    });
+  });
 };
 
 const confirmRefinement = async (): Promise<boolean> => {
-  const inquirer = await import("inquirer");
-  const { satisfied } = await inquirer.default.prompt<{ satisfied: boolean }>({
-    type: "confirm",
-    name: "satisfied",
-    message: "Are you satisfied with the refined prompt?",
-    default: true,
+  return new Promise((resolve) => {
+    rl.question(
+      "Are you satisfied with the refined prompt? (y/n): ",
+      (answer) => {
+        answer = answer.toLowerCase();
+        resolve(answer === "y" || answer === "yes");
+      },
+    );
   });
-  return satisfied;
 };
 
 // Refine command action
