@@ -7,9 +7,8 @@ import {
   Textarea,
   VStack,
 } from '@chakra-ui/react';
-import fs from "fs";
 import path from "path";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { exists, readTextFile, BaseDirectory } from '@tauri-apps/api/fs';
 
 import { Assistant } from "../core/Assistant";
@@ -24,18 +23,14 @@ interface ChatMessage {
 }
 
 // Chat component
-const messages: ChatMessage[] = [
-  { role: 'user', content: 'Hello, I have a question.' },
-  { role: 'assistant', content: 'Of course! What can I help you with?' },
-  // Add more messages here
-];
+const messages: Message[] = [];
 
 const Chat: React.FC = () => {
   // For tracking user's input
   const [inputValue, setInputValue] = useState('');
 
   // For managing the list of messages
-  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages);
+  const [chatMessages, setChatMessages] = useState<Message[]>(messages);
 
   const promptFolder = "foo-1820";
   const promptFilePath = path.join("prompts", promptFolder, "prompt.json");
@@ -44,17 +39,26 @@ const Chat: React.FC = () => {
   const messageHandler = new MessageHandler(messagesFilePath);
   const assistant = new Assistant(process.env.OPENAI_API_KEY as any);
 
+  useEffect(() => {
+    const loadMessages = async () => {
+      return await messageHandler.readMessages();
+    };
+
+    const messages = loadMessages().then((messages) => {
+      setChatMessages(messages);
+    });
+  }, []);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
   };
 
   const handleSendMessage = async () => {
-    // Add the new message to the chatMessages array
-    setChatMessages([
-      ...chatMessages,
-      { role: 'user', content: inputValue },
-    ]);
+    const messages: Message[] = await messageHandler.readMessages();
 
+    // Add the new message to the chatMessages array
+    setChatMessages(prevState => [ ...prevState, { role: 'user', content: inputValue }])
+    
     // Clear the input field
     setInputValue('');
 
@@ -64,9 +68,7 @@ const Chat: React.FC = () => {
       role: "user",
     } as Message);
 
-    console.log("handleSendMessage", inputValue);
     const fileExists = await exists(promptFilePath, { dir: BaseDirectory.Desktop });
-    console.log("fileExists", fileExists)
 
     let promptAttributes: PromptAttributes;
     if (fileExists) {
@@ -83,15 +85,14 @@ const Chat: React.FC = () => {
           messageHandler.getMessages(),
         );
   
-        console.log(`Assistant: ${assistantOutput}`);
         messageHandler.addMessage({
           content: assistantOutput,
           role: "assistant",
         } as Message);
   
         // Add the assistant's response to the chatMessages array
-        setChatMessages([
-          ...chatMessages,
+        setChatMessages(prevState => [
+          ...prevState,
           { role: 'assistant', content: assistantOutput },
         ]);
       } catch (error: any) {
