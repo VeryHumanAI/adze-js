@@ -1,7 +1,15 @@
-import React from 'react';
-import { Flex, Box, Text, VStack, Center } from '@chakra-ui/react';
+import { AddIcon } from '@chakra-ui/icons';
+import {
+  Box,
+  Center,
+  Flex,
+  IconButton,
+  Textarea,
+  VStack,
+} from '@chakra-ui/react';
+import React, { useState } from 'react';
 
-import Message from "./Message"
+import Message from "./Message";
 
 // This is the message type that you've provided in your example
 interface ChatMessage {
@@ -17,20 +25,62 @@ const messages: ChatMessage[] = [
 ];
 
 const Chat: React.FC = () => {
+  // For tracking user's input
+  const [inputValue, setInputValue] = useState('');
+
+  // For managing the list of messages
+  const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInputValue(e.target.value);
+  };
+
+  const handleSendMessage = () => {
+    // Add the new message to the chatMessages array
+    setChatMessages([
+      ...chatMessages,
+      { role: 'user', content: inputValue },
+    ]);
+
+    // Clear the input field
+    setInputValue('');
+  };
+
   return (
     <Center minH="100vh" minW="100vw">
-      <VStack
+      <Flex
         w={['95%', '75%', '50%', '33%']} //Responsive width adjustment
-        spacing="3"
-        p="5"
+        minH="80vh"
+        flexDirection="column"
         boxShadow="xl"
         borderRadius="lg"
         bg="white"
+        p="5"
       >
-        {messages.map((message, index) => (
-          <Message key={index} role={message.role} content={message.content} />
-        ))}
-      </VStack>
+        <VStack flex="1" overflowY="auto" spacing="3">
+          {chatMessages.map((message, index) => (
+            <Message key={index} role={message.role} content={message.content} />
+          ))}
+        </VStack>
+        <Box pt="5">
+          <Flex alignItems="center">
+            <Textarea
+              value={inputValue}
+              onChange={handleInputChange}
+              placeholder="Type your message..."
+              size="sm"
+              flexGrow={1}
+              mr="2"
+            />
+            <IconButton
+              icon={<AddIcon />}
+              colorScheme="blue"
+              onClick={handleSendMessage}
+              aria-label="Send message"
+            />
+          </Flex>
+        </Box>
+      </Flex>
     </Center>
   );
 };
