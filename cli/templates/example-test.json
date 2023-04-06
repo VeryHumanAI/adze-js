@@ -1,0 +1,7 @@
+{
+  "description": "An example test that always returns true.",
+  "messages": [],
+  "skip": false,
+  "test": "The AI must always return true.",
+  "title": "Example Test"
+}

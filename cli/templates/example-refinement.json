@@ -1,0 +1,17 @@
+{
+  "assistantOutput": "Example AI output",
+  "comments": ["This is an example refinement file."],
+  "configuration": {
+    "frequencyPenalty": 0,
+    "maximumLength": 2048,
+    "presencePenalty": 0,
+    "temperature": 1,
+    "topP": 1
+  },
+  "description": "An example refinement that led to the initial system prompt.",
+  "messages": [],
+  "previousPrompt": "Initial system prompt",
+  "refinementStatement": "Example refinement statement",
+  "title": "Example Refinement",
+  "updatedPrompt": "Updated system prompt"
+}

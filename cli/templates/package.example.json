@@ -1,0 +1,29 @@
+{
+  "name": "your-adze-js-project",
+  "version": "1.0.0",
+  "description": "AdzeJS project for AI prompt refinement",
+  "type": "module",
+  "scripts": {
+    "dev": "adze-js dev",
+    "refine": "adze-js refine",
+    "snapshot": "adze-js snapshot",
+    "test": "adze-js test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "enter-your-repository-url-here"
+  },
+  "author": "Your Name",
+  "license": "MIT",
+  "dependencies": {
+    "@types/node": "^14.17.5",
+    "commander": "^8.3.0",
+    "dotenv": "^10.0.0",
+    "inquirer": "^8.2.0",
+    "openai": "^0.27.0"
+  },
+  "devDependencies": {
+    "ts-node-dev": "^1.1.8",
+    "typescript": "^4.3.5"
+  }
+}
