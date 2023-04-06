@@ -3,6 +3,7 @@
     "baseUrl": ".",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
+    "jsx": "react",
     "module": "CommonJS",
     "outDir": "./dist",
     "paths": {

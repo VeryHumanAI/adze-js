@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "outDir": "./public/build"
+  },
+  "include": ["src/ui/**/*"],
+  "watchOptions": {
+    "excludeDirectories": ["node_modules"]
+  }
+}
