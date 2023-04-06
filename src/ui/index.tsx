@@ -1,9 +1,13 @@
-import React from "react";
-import ReactDOM from "react-dom";
+import React from 'react';
+import ReactDOM from 'react-dom';
+import { ThemeProvider } from './ThemeProvider';
+import Chat from './Chat';
 
 ReactDOM.render(
   <React.StrictMode>
-    <div>Hello, world!</div>
+    <ThemeProvider>
+      <Chat />
+    </ThemeProvider>
   </React.StrictMode>,
-  document.getElementById("root")
+  document.getElementById('root')
 );
