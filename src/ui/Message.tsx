@@ -17,7 +17,7 @@ const Message: React.FC<MessageProps> = ({ role, content }) => {
   return (
     <Flex justifyContent={justifyContent} mb="3">
       <Box
-        maxW="70%"
+        maxW="80%"
         bg={bgColor}
         color={textColor}
         borderRadius={borderRadius}
