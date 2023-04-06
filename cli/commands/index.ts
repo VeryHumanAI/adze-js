@@ -1,7 +1,9 @@
 #!/usr/bin/env ts-node-dev
 /// <reference types="node" />
 
+import { execSync } from "child_process";
 import { Command } from "commander";
+import path from "path";
 import "source-map-support/register";
 
 import dev from "./dev";
@@ -18,12 +20,22 @@ program
 
 program
   .command("dev")
-  .description("Start the development REPL")
+  .description("Start the development server/UI")
   .option(
     "-s, --snapshot-version <number>",
     "Specify a version number for the system prompt snapshot",
   )
-  .action((options) => dev(options));
+  .action((options) => {
+    try {
+      const adzeJsPackagePath = path.resolve(__dirname, "../../adze-js");
+      execSync(
+        'concurrently "yarn server" "yarn tauri" "parcel public/index.html"',
+        { cwd: adzeJsPackagePath },
+      );
+    } catch (err) {
+      console.error(err);
+    }
+  });
 
 program
   .command("init")

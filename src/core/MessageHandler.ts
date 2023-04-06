@@ -16,7 +16,7 @@ export class MessageHandler {
 
   public addMessage(message: Message): void {
     this.messages.push(message);
-    this.writeMessages();
+    // this.writeMessages();
   }
 
   public getMessages(): Message[] {
@@ -24,12 +24,12 @@ export class MessageHandler {
   }
 
   private readMessages(): Message[] {
-    if (fs.existsSync(this.messagesFilePath)) {
-      return JSON.parse(fs.readFileSync(this.messagesFilePath, "utf8"))
-        .messages;
-    } else {
-      return [];
-    }
+    // if (fs.existsSync(this.messagesFilePath)) {
+    //   return JSON.parse(fs.readFileSync(this.messagesFilePath, "utf8"))
+    //     .messages;
+    // } else {
+    return [];
+    // }
   }
 
   private writeMessages(): void {

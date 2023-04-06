@@ -7,9 +7,15 @@ import {
   Textarea,
   VStack,
 } from '@chakra-ui/react';
+import fs from "fs";
+import path from "path";
 import React, { useState } from 'react';
+import { exists, readTextFile, BaseDirectory } from '@tauri-apps/api/fs';
 
-import Message from "./Message";
+import { Assistant } from "../core/Assistant";
+import { Message, MessageHandler } from "../core/MessageHandler";
+import { Prompt, PromptAttributes } from "../core/Prompt";
+import MessageBubble from "./MessageBubble";
 
 // This is the message type that you've provided in your example
 interface ChatMessage {
@@ -31,11 +37,18 @@ const Chat: React.FC = () => {
   // For managing the list of messages
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>(messages);
 
+  const promptFolder = "foo-1820";
+  const promptFilePath = path.join("prompts", promptFolder, "prompt.json");
+  const messagesFilePath = path.join("prompts", promptFolder, "messages.json");
+
+  const messageHandler = new MessageHandler(messagesFilePath);
+  const assistant = new Assistant(process.env.OPENAI_API_KEY as any);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInputValue(e.target.value);
   };
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     // Add the new message to the chatMessages array
     setChatMessages([
       ...chatMessages,
@@ -44,6 +57,53 @@ const Chat: React.FC = () => {
 
     // Clear the input field
     setInputValue('');
+
+    // Call the API to get the assistant's response
+    messageHandler.addMessage({
+      content: inputValue,
+      role: "user",
+    } as Message);
+
+    console.log("handleSendMessage", inputValue);
+    const fileExists = await exists(promptFilePath, { dir: BaseDirectory.Desktop });
+    console.log("fileExists", fileExists)
+
+    let promptAttributes: PromptAttributes;
+    if (fileExists) {
+      console.log("exists!")
+
+      const promptContents = await readTextFile(promptFilePath, { dir: BaseDirectory.Desktop });
+      promptAttributes = JSON.parse(promptContents);
+
+      // Add validation checks here
+
+      try {
+        const assistantOutput = await assistant.createResponse(
+          new Prompt(promptAttributes),
+          messageHandler.getMessages(),
+        );
+  
+        console.log(`Assistant: ${assistantOutput}`);
+        messageHandler.addMessage({
+          content: assistantOutput,
+          role: "assistant",
+        } as Message);
+  
+        // Add the assistant's response to the chatMessages array
+        setChatMessages([
+          ...chatMessages,
+          { role: 'assistant', content: assistantOutput },
+        ]);
+      } catch (error: any) {
+        console.error("Error communicating with AI: ", error.message);
+      }
+    } else {
+      console.log("does not exist :'(")
+      // First run, set up default settings and ask user for prompt details
+      // promptAttributes = {
+      //   /* default settings */
+      // };
+    }
   };
 
   return (
@@ -59,7 +119,7 @@ const Chat: React.FC = () => {
       >
         <VStack align="stretch" flex="1" overflowY="auto" spacing="3">
           {chatMessages.map((message, index) => (
-            <Message key={index} role={message.role} content={message.content} />
+            <MessageBubble key={index} role={message.role} content={message.content} />
           ))}
         </VStack>
         <Box pt="5">
